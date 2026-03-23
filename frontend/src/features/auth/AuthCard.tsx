@@ -63,7 +63,7 @@ export function AuthCard({ mode }: Props) {
       <div>
         <h1 className="font-display text-3xl font-bold">{mode === "login" ? "Welcome back" : "Create your GuruHome account"}</h1>
         <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-          {mode === "login" ? "Use email/password or phone/password." : "Choose your role to access parent, tutor, or admin workflows."}
+          {mode === "login" ? "Use email/password or phone/password." : "Choose your role to join as a parent or tutor."}
         </p>
       </div>
       {mode === "register" && <input name="full_name" className="field" placeholder="Full name" required />}
@@ -73,7 +73,6 @@ export function AuthCard({ mode }: Props) {
         <select name="role" className="field" defaultValue="parent">
           <option value="parent">Parent</option>
           <option value="tutor">Tutor</option>
-          <option value="admin">Admin</option>
         </select>
       )}
       <input name="password" className="field" placeholder="Password" type="password" required />

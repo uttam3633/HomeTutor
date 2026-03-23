@@ -18,6 +18,9 @@ from app.models import OTP, ParentProfile, TutorProfile, User, UserRole
 
 
 def register_user(db: Session, full_name: str, email: str | None, phone: str, password: str, role: UserRole) -> User:
+    if role == UserRole.admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Admin registration is not allowed")
+
     existing_by_email = db.scalar(select(User).where(User.email == email)) if email else None
     users = db.scalars(select(User)).all()
     existing_by_phone = next((candidate for candidate in users if decrypt_phone(candidate.phone_encrypted) == phone), None)
@@ -103,6 +106,8 @@ def verify_otp(db: Session, identifier: str, code: str, role: UserRole) -> User:
             db.add(ParentProfile(user_id=matched_user.id))
         elif role == UserRole.tutor:
             db.add(TutorProfile(user_id=matched_user.id))
+    else:
+        role = matched_user.role
 
     matched_user.is_verified = True
     matched_user.last_login_at = datetime.now(UTC)
