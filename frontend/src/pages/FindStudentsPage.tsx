@@ -27,7 +27,7 @@ export function FindStudentsPage() {
   });
 
   return (
-    <section className="section-shell py-14">
+    <section className="section-shell page-entrance py-14">
       <SectionHeading eyebrow="Find Students" title="Browse active parent requirements and unlock verified contacts" description="Tutors can purchase leads individually or combine them with a subscription plan." />
       <div className="mt-8 grid gap-4 md:grid-cols-[1fr_1fr_auto]">
         <input className="field" placeholder="Filter by city" value={city} onChange={(event) => updateParam("city", event.target.value)} />
@@ -44,8 +44,8 @@ export function FindStudentsPage() {
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
             {leadsQuery.data?.map((lead) => (
-              <article key={lead.id} className="glass-panel p-6">
-                <p className="text-xs font-semibold uppercase tracking-[0.25em] text-orange-500">{lead.city} • {lead.area}</p>
+              <article key={lead.id} className="panel-surface p-6">
+                <p className="soft-badge border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-300">{lead.city} • {lead.area}</p>
                 <h3 className="mt-3 text-xl font-bold">{lead.class_name} {lead.board}</h3>
                 <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{lead.subjects.join(", ")} | {lead.mode} | Budget ₹{lead.budget}</p>
                 <div className="mt-4 space-y-2 text-sm">

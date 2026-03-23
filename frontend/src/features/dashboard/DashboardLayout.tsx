@@ -17,9 +17,9 @@ const sidebar = [
 
 export function DashboardLayout({ title, subtitle, children }: Props) {
   return (
-    <section className="section-shell py-10">
+    <section className="section-shell page-entrance py-10">
       <div className="grid gap-6 lg:grid-cols-[260px_1fr]">
-        <aside className="glass-panel h-fit p-5">
+        <aside className="panel-surface h-fit p-5">
           <p className="font-display text-2xl font-bold">{title}</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">{subtitle}</p>
           <div className="mt-6 space-y-2">

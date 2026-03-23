@@ -7,10 +7,9 @@ type Props = {
 
 export function DashboardPanel({ title, children }: Props) {
   return (
-    <div className="glass-panel p-6">
+    <div className="panel-surface p-6">
       <h2 className="text-xl font-bold">{title}</h2>
       <div className="mt-4">{children}</div>
     </div>
   );
 }
-

@@ -14,9 +14,9 @@ export function PricingGrid() {
       {plans.map((plan, index) => (
         <article
           key={plan.name}
-          className={`glass-panel p-6 ${index === 1 ? "ring-2 ring-orange-400" : ""}`}
+          className={`panel-surface p-6 ${index === 1 ? "ring-2 ring-orange-400" : ""}`}
         >
-          <p className="text-sm font-semibold uppercase tracking-[0.25em] text-orange-500">{plan.name}</p>
+          <p className="soft-badge border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-300">{plan.name}</p>
           <p className="mt-4 font-display text-4xl font-bold">{plan.price}</p>
           <p className="mt-3 text-sm text-slate-600 dark:text-slate-400">{plan.description}</p>
           <div className="mt-6 space-y-3">

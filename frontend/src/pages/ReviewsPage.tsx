@@ -20,7 +20,7 @@ export function ReviewsPage() {
     })) ?? [];
 
   return (
-    <section className="section-shell py-14">
+    <section className="section-shell page-entrance py-14">
       <SectionHeading eyebrow="Reviews" title="Social proof from both sides of the marketplace" description="Approved parent and tutor reviews improve trust and help future users make faster decisions." />
       <div className="mt-10">
         <QueryState
