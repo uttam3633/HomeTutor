@@ -53,6 +53,7 @@ services:
       - .env
     volumes:
       - ./frontend:/usr/src/app
+      - /usr/src/app/node_modules
 
   nginx:
     image: nginx:1.27-alpine

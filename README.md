@@ -15,11 +15,12 @@ GuruHome is a production-oriented two-sided marketplace platform connecting pare
 ## Quick Start
 
 1. Copy `.env.example` to `.env`
-2. Run database migrations: `docker compose run --rm backend alembic upgrade head`
-3. Seed sample users: `docker compose run --rm backend python -m app.db.seed`
-4. Run `docker compose up --build`
-5. Frontend: `http://localhost`
-6. API docs: `http://localhost/api/docs`
+2. Run `docker compose build`
+3. Run database migrations: `docker compose run --rm backend alembic upgrade head`
+4. Seed sample users: `docker compose run --rm backend python -m app.db.seed`
+5. Run `docker compose up`
+6. Frontend: `http://localhost`
+7. API docs: `http://localhost/api/docs`
 
 ## Structure
 
@@ -34,3 +35,8 @@ GuruHome is a production-oriented two-sided marketplace platform connecting pare
 - Phone numbers are encrypted before database persistence.
 - The project ships as a secure, modular starter with core marketplace flows.
 - All seeded users use password `Test@12345`.
+
+## Local Run Notes
+
+- The frontend container uses an isolated `node_modules` volume so dependencies are available even when the project folder is mounted for development.
+- If Docker reports an environment issue, verify that `.env` exists in the project root before running the compose commands.
