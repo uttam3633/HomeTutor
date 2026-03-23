@@ -6,7 +6,6 @@ export function Footer() {
           <p className="font-display text-xl font-bold">GuruHome</p>
           <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">Trusted tuition marketplace for families and tutors across India.</p>
         </div>
-        <div className="text-sm text-slate-500 dark:text-slate-400">Built with React, FastAPI, PostgreSQL, Redis, Celery, and Docker.</div>
       </div>
     </footer>
   );
