@@ -8,6 +8,7 @@ from app.models import ApprovalStatus, AuditLog, City, Payment, Review, Subject,
 from app.schemas.common import ApprovalUpdate, PaymentReview
 from app.services.audit import log_action
 from app.services.payments import analytics_summary, review_payment
+from app.utils.sanitize import sanitize_text
 
 router = APIRouter()
 
@@ -91,7 +92,7 @@ def create_city(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role(UserRole.admin)),
 ):
-    city = City(name=name)
+    city = City(name=sanitize_text(name) or "")
     db.add(city)
     db.commit()
     db.refresh(city)
@@ -104,7 +105,7 @@ def create_subject(
     db: Session = Depends(get_db),
     current_user: User = Depends(require_role(UserRole.admin)),
 ):
-    subject = Subject(name=name)
+    subject = Subject(name=sanitize_text(name) or "")
     db.add(subject)
     db.commit()
     db.refresh(subject)

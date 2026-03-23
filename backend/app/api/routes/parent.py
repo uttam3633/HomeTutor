@@ -2,7 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy import desc, select
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_current_user, require_role
+from app.api.deps import require_role
+from app.core.security import encrypt_phone
 from app.db.session import get_db
 from app.models import LeadUnlock, ParentLead, Payment, Review, UnlockTarget, User, UserRole
 from app.schemas.common import ParentLeadCreate, PaymentCreate, PaymentOut, PaymentProofCreate, ReviewCreate
@@ -22,7 +23,7 @@ def create_requirement(
     lead = ParentLead(
         parent_id=current_user.id,
         parent_name=sanitize_text(payload.parent_name) or current_user.full_name,
-        mobile_encrypted=current_user.phone_encrypted if payload.mobile else current_user.phone_encrypted,
+        mobile_encrypted=encrypt_phone(payload.mobile),
         email=payload.email,
         child_name=sanitize_text(payload.child_name) or "",
         class_name=sanitize_text(payload.class_name) or "",

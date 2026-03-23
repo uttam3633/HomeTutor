@@ -14,7 +14,7 @@ from app.core.security import (
     hash_password,
     verify_password,
 )
-from app.models import OTP, User, UserRole
+from app.models import OTP, ParentProfile, TutorProfile, User, UserRole
 
 
 def register_user(db: Session, full_name: str, email: str | None, phone: str, password: str, role: UserRole) -> User:
@@ -22,7 +22,7 @@ def register_user(db: Session, full_name: str, email: str | None, phone: str, pa
     users = db.scalars(select(User)).all()
     existing_by_phone = next((candidate for candidate in users if decrypt_phone(candidate.phone_encrypted) == phone), None)
     if existing_by_email or existing_by_phone:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email already registered")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Email or phone already registered")
 
     user = User(
         full_name=full_name,
@@ -35,6 +35,11 @@ def register_user(db: Session, full_name: str, email: str | None, phone: str, pa
     db.add(user)
     db.commit()
     db.refresh(user)
+    if role == UserRole.parent:
+        db.add(ParentProfile(user_id=user.id))
+    elif role == UserRole.tutor:
+        db.add(TutorProfile(user_id=user.id))
+    db.commit()
     return user
 
 
@@ -93,6 +98,11 @@ def verify_otp(db: Session, identifier: str, code: str, role: UserRole) -> User:
             is_verified=True,
         )
         db.add(matched_user)
+        db.flush()
+        if role == UserRole.parent:
+            db.add(ParentProfile(user_id=matched_user.id))
+        elif role == UserRole.tutor:
+            db.add(TutorProfile(user_id=matched_user.id))
 
     matched_user.is_verified = True
     matched_user.last_login_at = datetime.now(UTC)

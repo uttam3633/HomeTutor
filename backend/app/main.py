@@ -11,6 +11,7 @@ from app.core.config import settings
 from app.core.limiter import limiter
 from app.core.security_headers import SecurityHeadersMiddleware
 from app.db.session import Base, engine
+from app.models import entities  # noqa: F401
 
 
 @asynccontextmanager

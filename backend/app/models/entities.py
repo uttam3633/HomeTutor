@@ -1,5 +1,5 @@
 import enum
-from datetime import datetime
+from datetime import date, datetime
 
 from sqlalchemy import JSON, Boolean, Date, DateTime, Enum, Float, ForeignKey, Integer, Numeric, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -108,7 +108,7 @@ class ParentLead(Base):
     pincode: Mapped[str] = mapped_column(String(12))
     budget: Mapped[float] = mapped_column(Float)
     preferred_time: Mapped[str] = mapped_column(String(255))
-    start_date: Mapped[datetime | None] = mapped_column(Date, nullable=True)
+    start_date: Mapped[date | None] = mapped_column(Date, nullable=True)
     notes: Mapped[str | None] = mapped_column(Text, nullable=True)
     status: Mapped[str] = mapped_column(String(50), default="open")
     created_at: Mapped[datetime] = mapped_column(DateTime, default=datetime.utcnow)
