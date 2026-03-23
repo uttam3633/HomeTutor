@@ -1,18 +1,37 @@
+import { useQuery } from "@tanstack/react-query";
+
+import { fetchReviews } from "../api/public";
+import { getApiErrorMessage } from "../api/client";
 import { CardCarousel } from "../components/home/CardCarousel";
+import { QueryState } from "../components/shared/QueryState";
 import { SectionHeading } from "../components/shared/SectionHeading";
 
-const reviews = [
-  { title: "Parent from Pune", subtitle: "4.9/5 rating", meta: "The tutor shortlist felt curated and the unlock flow was transparent." },
-  { title: "Tutor from Delhi", subtitle: "4.8/5 rating", meta: "Subscription plus single lead unlocks gave me enough flexibility." },
-  { title: "Parent from Chennai", subtitle: "5/5 rating", meta: "Admin approval added confidence when uploading payment proof." },
-];
-
 export function ReviewsPage() {
+  const reviewsQuery = useQuery({
+    queryKey: ["reviews-page"],
+    queryFn: fetchReviews,
+  });
+
+  const cards =
+    reviewsQuery.data?.map((review) => ({
+      title: `${"★".repeat(review.rating)} ${review.tutor_name}`,
+      subtitle: `Review by ${review.parent_name}`,
+      meta: review.comment ?? "Approved platform review.",
+    })) ?? [];
+
   return (
     <section className="section-shell py-14">
       <SectionHeading eyebrow="Reviews" title="Social proof from both sides of the marketplace" description="Approved parent and tutor reviews improve trust and help future users make faster decisions." />
       <div className="mt-10">
-        <CardCarousel cards={reviews} />
+        <QueryState
+          isLoading={reviewsQuery.isLoading}
+          errorMessage={reviewsQuery.error ? getApiErrorMessage(reviewsQuery.error) : null}
+          empty={cards.length === 0}
+          emptyTitle="No reviews available"
+          emptyDescription="Approved reviews will appear here as users submit them."
+        >
+          <CardCarousel cards={cards} />
+        </QueryState>
       </div>
     </section>
   );

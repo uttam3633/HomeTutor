@@ -1,8 +1,12 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { api } from "../../api/client";
+import { api, getApiErrorMessage } from "../../api/client";
+import { fetchCities, fetchSubjects } from "../../api/public";
 import { Button } from "../../components/shared/Button";
+import { useAuth } from "../auth/AuthProvider";
 
 type Props = {
   type: "parent" | "tutor";
@@ -11,10 +15,39 @@ type Props = {
 export function MultiStepLeadForm({ type }: Props) {
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
+  const formRef = useRef<HTMLFormElement | null>(null);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useAuth();
+
+  const citiesQuery = useQuery({
+    queryKey: ["public-cities"],
+    queryFn: fetchCities,
+  });
+
+  const subjectsQuery = useQuery({
+    queryKey: ["public-subjects"],
+    queryFn: fetchSubjects,
+  });
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (!isAuthenticated) {
+      toast.error("Please login before posting.");
+      navigate("/login");
+      return;
+    }
+
     const formData = new FormData(event.currentTarget);
+    const subjectList = String(formData.get("subjects") || "")
+      .split(",")
+      .map((item) => item.trim())
+      .filter(Boolean);
+
+    if (subjectList.length === 0) {
+      toast.error("Add at least one subject");
+      return;
+    }
+
     setLoading(true);
     try {
       if (type === "parent") {
@@ -25,7 +58,7 @@ export function MultiStepLeadForm({ type }: Props) {
           child_name: formData.get("child_name"),
           class_name: formData.get("class_name"),
           board: formData.get("board"),
-          subjects: String(formData.get("subjects")).split(",").map((item) => item.trim()),
+          subjects: subjectList,
           mode: formData.get("mode"),
           address: formData.get("address"),
           city: formData.get("city"),
@@ -39,7 +72,7 @@ export function MultiStepLeadForm({ type }: Props) {
       } else {
         await api.post("/tutor/availability", {
           tutor_name: formData.get("name"),
-          subjects: String(formData.get("subjects")).split(",").map((item) => item.trim()),
+          subjects: subjectList,
           class_range: formData.get("class_range"),
           experience: Number(formData.get("experience")),
           mode: String(formData.get("mode")).split(",").map((item) => item.trim()),
@@ -53,15 +86,22 @@ export function MultiStepLeadForm({ type }: Props) {
         });
       }
       toast.success(type === "parent" ? "Requirement posted" : "Availability posted");
-    } catch {
-      toast.error("Unable to submit right now");
+      formRef.current?.reset();
+      setStep(1);
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <form onSubmit={handleSubmit} className="glass-panel space-y-6 p-6 sm:p-8">
+    <form ref={formRef} onSubmit={handleSubmit} className="glass-panel space-y-6 p-6 sm:p-8">
+      {!isAuthenticated ? (
+        <div className="rounded-2xl border border-orange-200 bg-orange-50 p-4 text-sm text-orange-700 dark:border-orange-900 dark:bg-orange-950/30 dark:text-orange-300">
+          You need to <Link to="/login" className="font-semibold underline">login</Link> before posting.
+        </div>
+      ) : null}
       <div className="flex flex-wrap gap-3">
         {[1, 2, 3].map((value) => (
           <div
@@ -78,7 +118,16 @@ export function MultiStepLeadForm({ type }: Props) {
           <input name="name" className="field" placeholder={type === "parent" ? "Parent name" : "Tutor name"} required />
           <input name={type === "parent" ? "mobile" : "experience"} className="field" placeholder={type === "parent" ? "Mobile number" : "Experience in years"} required />
           <input name="email" className="field" placeholder="Email (optional)" />
-          <input name="subjects" className="field" placeholder="Subjects, comma separated" required />
+          <input
+            name="subjects"
+            className="field"
+            placeholder={
+              subjectsQuery.data?.length
+                ? `Subjects, comma separated. Examples: ${subjectsQuery.data.slice(0, 3).map((item) => item.name).join(", ")}`
+                : "Subjects, comma separated"
+            }
+            required
+          />
         </div>
       )}
 
@@ -109,7 +158,12 @@ export function MultiStepLeadForm({ type }: Props) {
 
       {step === 3 && (
         <div className="grid gap-4 md:grid-cols-2">
-          <input name="city" className="field" placeholder="City" required />
+          <input
+            name="city"
+            className="field"
+            placeholder={citiesQuery.data?.length ? `City. Examples: ${citiesQuery.data.slice(0, 3).map((item) => item.name).join(", ")}` : "City"}
+            required
+          />
           <input name="area" className="field" placeholder="Area" required />
           {type === "parent" ? (
             <>
