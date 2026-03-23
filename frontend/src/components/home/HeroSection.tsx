@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { ArrowRight, Search, ShieldCheck, Sparkles } from "lucide-react";
+import { ArrowRight, Search, Sparkles } from "lucide-react";
 
 import { Button } from "../shared/Button";
 
@@ -58,13 +58,6 @@ export function HeroSection() {
             <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
               <p className="text-sm font-semibold text-green-700 dark:text-green-400">Tutor Lead Flow</p>
               <p className="mt-2 font-semibold">Buy plans or unlock specific parent contacts after admin verifies UPI payment proof.</p>
-            </div>
-            <div className="rounded-3xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-              <div className="flex items-center gap-3">
-                <ShieldCheck className="text-orange-500" size={18} />
-                <p className="font-semibold">VAPT-aware architecture by default</p>
-              </div>
-              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">JWT auth, rate limits, secure headers, input sanitization, approval gates, audit logs.</p>
             </div>
           </div>
         </div>

@@ -4,7 +4,6 @@ import { fetchReviews, fetchTutors } from "../api/public";
 import { getApiErrorMessage } from "../api/client";
 import { CardCarousel } from "../components/home/CardCarousel";
 import { HeroSection } from "../components/home/HeroSection";
-import { MultiStepShowcase } from "../components/home/MultiStepShowcase";
 import { SearchStrip } from "../components/home/SearchStrip";
 import { QueryState } from "../components/shared/QueryState";
 import { SectionHeading } from "../components/shared/SectionHeading";
@@ -38,12 +37,6 @@ export function HomePage() {
     <>
       <HeroSection />
       <SearchStrip />
-      <section className="section-shell py-20">
-        <SectionHeading eyebrow="How It Works" title="Built for trust, speed, and real tuition conversions" description="GuruHome balances marketplace growth with practical approval workflows for parents, tutors, and admins." />
-        <div className="mt-10">
-          <MultiStepShowcase />
-        </div>
-      </section>
       <section className="section-shell py-10">
         <SectionHeading eyebrow="Featured Tutors" title="Profiles designed to convert on first glance" description="Tutor cards highlight teaching strength, mode, pricing, and verification state for quick parent decisions." />
         <div className="mt-10">
