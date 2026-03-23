@@ -6,14 +6,17 @@ import { Toaster } from "sonner";
 
 import { router } from "./app/router";
 import "./app/styles.css";
+import { AuthProvider } from "./features/auth/AuthProvider";
 
 const queryClient = new QueryClient();
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
     <QueryClientProvider client={queryClient}>
-      <RouterProvider router={router} />
-      <Toaster richColors position="top-right" />
+      <AuthProvider>
+        <RouterProvider router={router} />
+        <Toaster richColors position="top-right" />
+      </AuthProvider>
     </QueryClientProvider>
   </React.StrictMode>,
 );

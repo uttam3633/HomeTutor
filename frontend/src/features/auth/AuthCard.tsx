@@ -1,8 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { toast } from "sonner";
 
-import { api } from "../../api/client";
+import { api, getApiErrorMessage } from "../../api/client";
 import { Button } from "../../components/shared/Button";
+import { useAuth } from "./AuthProvider";
+import { getDashboardRoute } from "../../lib/auth";
 
 type Props = {
   mode: "login" | "register";
@@ -10,33 +13,46 @@ type Props = {
 
 export function AuthCard({ mode }: Props) {
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
+  const { login } = useAuth();
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
+    const email = String(formData.get("email") || "").trim();
+    const phone = String(formData.get("phone") || "").trim();
+    const password = String(formData.get("password") || "");
+
+    if (mode === "login" && !email && !phone) {
+      toast.error("Enter either email or mobile number");
+      return;
+    }
+
     setLoading(true);
     try {
       if (mode === "register") {
         const response = await api.post("/auth/register", {
           full_name: formData.get("full_name"),
-          email: formData.get("email") || null,
-          phone: formData.get("phone"),
-          password: formData.get("password"),
+          email: email || null,
+          phone,
+          password,
           role: formData.get("role"),
         });
-        localStorage.setItem("guruhome-token", response.data.access_token);
+        const user = await login(response.data);
         toast.success("Registration successful");
+        navigate(getDashboardRoute(user.role));
       } else {
         const response = await api.post("/auth/login", {
-          email: formData.get("email") || null,
-          phone: formData.get("phone") || null,
-          password: formData.get("password"),
+          email: email || null,
+          phone: phone || null,
+          password,
         });
-        localStorage.setItem("guruhome-token", response.data.access_token);
+        const user = await login(response.data);
         toast.success("Login successful");
+        navigate(getDashboardRoute(user.role));
       }
-    } catch {
-      toast.error("Request failed. Check API configuration and try again.");
+    } catch (error) {
+      toast.error(getApiErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -52,7 +68,7 @@ export function AuthCard({ mode }: Props) {
       </div>
       {mode === "register" && <input name="full_name" className="field" placeholder="Full name" required />}
       <input name="email" className="field" placeholder="Email address" type="email" />
-      <input name="phone" className="field" placeholder="Mobile number" />
+      <input name="phone" className="field" placeholder="Mobile number" required={mode === "register"} />
       {mode === "register" && (
         <select name="role" className="field" defaultValue="parent">
           <option value="parent">Parent</option>

@@ -1,6 +1,8 @@
 import { Link, NavLink } from "react-router-dom";
 import { Menu } from "lucide-react";
 
+import { useAuth } from "../../features/auth/AuthProvider";
+import { getDashboardRoute } from "../../lib/auth";
 import { ThemeToggle } from "../shared/ThemeToggle";
 import { Button } from "../shared/Button";
 
@@ -15,6 +17,8 @@ const links = [
 ];
 
 export function Navbar() {
+  const { user, isAuthenticated, logout } = useAuth();
+
   return (
     <header className="sticky top-0 z-50 border-b border-slate-200/70 bg-cream/80 backdrop-blur-xl dark:border-slate-800 dark:bg-slate-950/80">
       <div className="section-shell flex h-20 items-center justify-between gap-4">
@@ -36,12 +40,25 @@ export function Navbar() {
         </nav>
         <div className="flex items-center gap-3">
           <ThemeToggle />
-          <Link to="/login" className="hidden sm:block">
-            <Button variant="secondary">Login</Button>
-          </Link>
-          <Link to="/register" className="hidden sm:block">
-            <Button>Join Now</Button>
-          </Link>
+          {isAuthenticated && user ? (
+            <>
+              <Link to={getDashboardRoute(user.role)} className="hidden sm:block">
+                <Button variant="secondary">Dashboard</Button>
+              </Link>
+              <Button className="hidden sm:inline-flex" onClick={logout}>
+                Logout
+              </Button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" className="hidden sm:block">
+                <Button variant="secondary">Login</Button>
+              </Link>
+              <Link to="/register" className="hidden sm:block">
+                <Button>Join Now</Button>
+              </Link>
+            </>
+          )}
           <button type="button" className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-slate-300 lg:hidden dark:border-slate-700">
             <Menu size={18} />
           </button>
