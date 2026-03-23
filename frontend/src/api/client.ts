@@ -2,8 +2,24 @@ import axios from "axios";
 
 import { clearAuthSession, getAccessToken } from "../lib/auth";
 
+function resolveApiBaseUrl() {
+  const configured = import.meta.env.VITE_API_URL;
+  if (configured) {
+    return configured;
+  }
+
+  if (typeof window !== "undefined") {
+    const { hostname, port, protocol } = window.location;
+    if (port === "5173") {
+      return `${protocol}//${hostname}:8000/api/v1`;
+    }
+  }
+
+  return "http://localhost:8000/api/v1";
+}
+
 export const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL ?? "http://localhost/api/v1",
+  baseURL: resolveApiBaseUrl(),
 });
 
 api.interceptors.request.use((config) => {
