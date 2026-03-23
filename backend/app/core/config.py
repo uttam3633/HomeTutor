@@ -27,6 +27,7 @@ class Settings(BaseSettings):
     smtp_username: str = ""
     smtp_password: str = ""
     smtp_from: str = "no-reply@guruhome.in"
+    auto_seed_demo_data: bool = True
 
 
 @lru_cache

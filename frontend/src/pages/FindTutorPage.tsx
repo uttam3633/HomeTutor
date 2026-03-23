@@ -26,6 +26,12 @@ export function FindTutorPage() {
     queryFn: () => fetchTutors({ city: city || undefined, subject: subject || undefined }),
   });
 
+  const tutors = (tutorsQuery.data ?? []).filter((tutor) => {
+    const matchesCity = !city || tutor.bio?.toLowerCase().includes(city.toLowerCase()) || tutor.name.toLowerCase().includes(city.toLowerCase());
+    const matchesSubject = !subject || tutor.subjects.some((item) => item.toLowerCase().includes(subject.toLowerCase()));
+    return matchesCity && matchesSubject;
+  });
+
   return (
     <section className="section-shell page-entrance py-14">
       <SectionHeading eyebrow="Find Tutor" title="Search tutors by city and subject" description="Results here are loaded from the public tutor directory and reflect approved tutor profiles." />
@@ -38,12 +44,12 @@ export function FindTutorPage() {
         <QueryState
           isLoading={tutorsQuery.isLoading}
           errorMessage={tutorsQuery.error ? getApiErrorMessage(tutorsQuery.error) : null}
-          empty={!tutorsQuery.data || tutorsQuery.data.length === 0}
+          empty={tutors.length === 0}
           emptyTitle="No tutors found"
           emptyDescription="Try adjusting the city or subject filter to broaden the search."
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {tutorsQuery.data?.map((tutor) => (
+            {tutors.map((tutor) => (
               <article key={tutor.id} className="panel-surface p-6">
                 <p className="soft-badge border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-300">{tutor.featured ? "Featured tutor" : "Verified tutor"}</p>
                 <h3 className="mt-3 text-xl font-bold">{tutor.name}</h3>

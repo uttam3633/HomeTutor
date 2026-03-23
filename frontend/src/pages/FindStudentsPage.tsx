@@ -26,6 +26,12 @@ export function FindStudentsPage() {
     queryFn: () => fetchParentLeads({ city: city || undefined, subject: subject || undefined }),
   });
 
+  const leads = (leadsQuery.data ?? []).filter((lead) => {
+    const matchesCity = !city || lead.city.toLowerCase().includes(city.toLowerCase()) || lead.area.toLowerCase().includes(city.toLowerCase());
+    const matchesSubject = !subject || lead.subjects.some((item) => item.toLowerCase().includes(subject.toLowerCase()));
+    return matchesCity && matchesSubject;
+  });
+
   return (
     <section className="section-shell page-entrance py-14">
       <SectionHeading eyebrow="Find Students" title="Browse active parent requirements and unlock verified contacts" description="Tutors can purchase leads individually or combine them with a subscription plan." />
@@ -38,12 +44,12 @@ export function FindStudentsPage() {
         <QueryState
           isLoading={leadsQuery.isLoading}
           errorMessage={leadsQuery.error ? getApiErrorMessage(leadsQuery.error) : null}
-          empty={!leadsQuery.data || leadsQuery.data.length === 0}
+          empty={leads.length === 0}
           emptyTitle="No parent requirements found"
           emptyDescription="Try a different city or subject to find more student leads."
         >
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {leadsQuery.data?.map((lead) => (
+            {leads.map((lead) => (
               <article key={lead.id} className="panel-surface p-6">
                 <p className="soft-badge border-orange-200 bg-orange-50 text-orange-600 dark:border-orange-900 dark:bg-orange-950/40 dark:text-orange-300">{lead.city} • {lead.area}</p>
                 <h3 className="mt-3 text-xl font-bold">{lead.class_name} {lead.board}</h3>

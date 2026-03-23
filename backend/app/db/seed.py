@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.core.security import encrypt_phone, hash_password
@@ -269,222 +269,7 @@ def seed() -> None:
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
-        maharashtra = get_or_create_state(db, name="Maharashtra", code="MH")
-        karnataka = get_or_create_state(db, name="Karnataka", code="KA")
-        delhi_state = get_or_create_state(db, name="Delhi", code="DL")
-
-        mumbai = get_or_create_city(db, name="Mumbai", state_id=maharashtra.id)
-        pune = get_or_create_city(db, name="Pune", state_id=maharashtra.id)
-        bengaluru = get_or_create_city(db, name="Bengaluru", state_id=karnataka.id)
-        delhi = get_or_create_city(db, name="Delhi", state_id=delhi_state.id)
-
-        for subject_name in ["Mathematics", "Science", "English", "Physics", "Chemistry", "Biology"]:
-            get_or_create_subject(db, name=subject_name)
-
-        admin_verified = upsert_user(
-            db,
-            full_name="Aarav Admin",
-            email="admin@guruhome.test",
-            phone="9000000001",
-            role=UserRole.admin,
-            is_verified=True,
-        )
-        upsert_user(
-            db,
-            full_name="Nisha Admin",
-            email="admin.pending@guruhome.test",
-            phone="9000000002",
-            role=UserRole.admin,
-            is_verified=False,
-        )
-
-        parent_verified = upsert_user(
-            db,
-            full_name="Priya Parent",
-            email="parent.verified@guruhome.test",
-            phone="9100000001",
-            role=UserRole.parent,
-            is_verified=True,
-        )
-        parent_unverified = upsert_user(
-            db,
-            full_name="Rohit Parent",
-            email="parent.unverified@guruhome.test",
-            phone="9100000002",
-            role=UserRole.parent,
-            is_verified=False,
-        )
-
-        tutor_verified = upsert_user(
-            db,
-            full_name="Ananya Tutor",
-            email="tutor.verified@guruhome.test",
-            phone="9200000001",
-            role=UserRole.tutor,
-            is_verified=True,
-        )
-        tutor_unverified = upsert_user(
-            db,
-            full_name="Kabir Tutor",
-            email="tutor.unverified@guruhome.test",
-            phone="9200000002",
-            role=UserRole.tutor,
-            is_verified=False,
-        )
-
-        upsert_parent_profile(
-            db,
-            user_id=parent_verified.id,
-            city_id=mumbai.id,
-            state_id=maharashtra.id,
-            address="Powai, Mumbai",
-            area="Powai",
-            pincode="400076",
-        )
-        upsert_parent_profile(
-            db,
-            user_id=parent_unverified.id,
-            city_id=pune.id,
-            state_id=maharashtra.id,
-            address="Baner, Pune",
-            area="Baner",
-            pincode="411045",
-        )
-
-        upsert_tutor_profile(
-            db,
-            user_id=tutor_verified.id,
-            city_id=bengaluru.id,
-            area="Indiranagar",
-            bio="Experienced CBSE and ICSE tutor for STEM subjects.",
-            experience_years=6,
-            fees=800.0,
-            subjects=["Mathematics", "Science", "Physics"],
-            class_range="6-12",
-            modes=["home", "online"],
-            demo_available=True,
-            approved_status=ApprovalStatus.approved,
-            featured=True,
-        )
-        upsert_tutor_profile(
-            db,
-            user_id=tutor_unverified.id,
-            city_id=delhi.id,
-            area="Rohini",
-            bio="New tutor awaiting verification.",
-            experience_years=2,
-            fees=500.0,
-            subjects=["English", "Biology"],
-            class_range="5-10",
-            modes=["online"],
-            demo_available=False,
-            approved_status=ApprovalStatus.pending,
-            featured=False,
-        )
-
-        ensure_parent_lead(
-            db,
-            parent=parent_verified,
-            parent_name="Priya Parent",
-            mobile="9100000001",
-            email="parent.verified@guruhome.test",
-            child_name="Ishaan",
-            class_name="8",
-            board="CBSE",
-            subjects=["Mathematics", "Science"],
-            mode=ModeType.home,
-            address="Powai, Mumbai",
-            city="Mumbai",
-            area="Powai",
-            pincode="400076",
-            budget=6000.0,
-            preferred_time="Evening 5 PM to 7 PM",
-            notes="Looking for a patient tutor for conceptual clarity.",
-        )
-        ensure_parent_lead(
-            db,
-            parent=parent_unverified,
-            parent_name="Rohit Parent",
-            mobile="9100000002",
-            email="parent.unverified@guruhome.test",
-            child_name="Siya",
-            class_name="10",
-            board="ICSE",
-            subjects=["English", "Biology"],
-            mode=ModeType.online,
-            address="Baner, Pune",
-            city="Pune",
-            area="Baner",
-            pincode="411045",
-            budget=4500.0,
-            preferred_time="Morning 7 AM to 8 AM",
-            notes="Needs structured board exam preparation.",
-        )
-
-        ensure_tutor_lead(
-            db,
-            tutor=tutor_verified,
-            tutor_name="Ananya Tutor",
-            subjects=["Mathematics", "Physics"],
-            class_range="8-12",
-            experience=6,
-            mode=["home", "online"],
-            city="Bengaluru",
-            area="Indiranagar",
-            fees=800.0,
-            available_time="Weekdays after 4 PM",
-            demo_available=True,
-            approved_status=ApprovalStatus.approved,
-        )
-        ensure_tutor_lead(
-            db,
-            tutor=tutor_unverified,
-            tutor_name="Kabir Tutor",
-            subjects=["English", "Biology"],
-            class_range="5-10",
-            experience=2,
-            mode=["online"],
-            city="Delhi",
-            area="Rohini",
-            fees=500.0,
-            available_time="Weekends",
-            demo_available=False,
-            approved_status=ApprovalStatus.pending,
-        )
-
-        ensure_payment(
-            db,
-            user_id=parent_verified.id,
-            amount="299.00",
-            purpose="unlock_tutor_contact",
-            status=PaymentStatus.verified,
-        )
-        ensure_payment(
-            db,
-            user_id=tutor_verified.id,
-            amount="499.00",
-            purpose="unlock_parent_contact",
-            status=PaymentStatus.pending,
-        )
-
-        ensure_subscription(
-            db,
-            tutor_id=tutor_verified.id,
-            plan_name="Growth",
-            lead_credits=25,
-            price=1499.0,
-        )
-
-        ensure_review(
-            db,
-            parent_id=parent_verified.id,
-            tutor_id=tutor_verified.id,
-            rating=5,
-            comment="Very clear explanations and punctual sessions.",
-            approved=True,
-        )
-
-        db.commit()
+        seed_session(db)
 
         print("Seed complete.")
         print(f"Password for all sample users: {DEFAULT_PASSWORD}")
@@ -494,6 +279,237 @@ def seed() -> None:
         print("Unverified student-side parent: parent.unverified@guruhome.test")
         print("Verified tutor: tutor.verified@guruhome.test")
         print("Unverified tutor: tutor.unverified@guruhome.test")
+    finally:
+        db.close()
+
+
+def seed_session(db: Session) -> None:
+    maharashtra = get_or_create_state(db, name="Maharashtra", code="MH")
+    karnataka = get_or_create_state(db, name="Karnataka", code="KA")
+    delhi_state = get_or_create_state(db, name="Delhi", code="DL")
+
+    mumbai = get_or_create_city(db, name="Mumbai", state_id=maharashtra.id)
+    pune = get_or_create_city(db, name="Pune", state_id=maharashtra.id)
+    bengaluru = get_or_create_city(db, name="Bengaluru", state_id=karnataka.id)
+    delhi = get_or_create_city(db, name="Delhi", state_id=delhi_state.id)
+
+    for subject_name in ["Mathematics", "Science", "English", "Physics", "Chemistry", "Biology"]:
+        get_or_create_subject(db, name=subject_name)
+
+    upsert_user(
+        db,
+        full_name="Aarav Admin",
+        email="admin@guruhome.test",
+        phone="9000000001",
+        role=UserRole.admin,
+        is_verified=True,
+    )
+    upsert_user(
+        db,
+        full_name="Nisha Admin",
+        email="admin.pending@guruhome.test",
+        phone="9000000002",
+        role=UserRole.admin,
+        is_verified=False,
+    )
+
+    parent_verified = upsert_user(
+        db,
+        full_name="Priya Parent",
+        email="parent.verified@guruhome.test",
+        phone="9100000001",
+        role=UserRole.parent,
+        is_verified=True,
+    )
+    parent_unverified = upsert_user(
+        db,
+        full_name="Rohit Parent",
+        email="parent.unverified@guruhome.test",
+        phone="9100000002",
+        role=UserRole.parent,
+        is_verified=False,
+    )
+
+    tutor_verified = upsert_user(
+        db,
+        full_name="Ananya Tutor",
+        email="tutor.verified@guruhome.test",
+        phone="9200000001",
+        role=UserRole.tutor,
+        is_verified=True,
+    )
+    tutor_unverified = upsert_user(
+        db,
+        full_name="Kabir Tutor",
+        email="tutor.unverified@guruhome.test",
+        phone="9200000002",
+        role=UserRole.tutor,
+        is_verified=False,
+    )
+
+    upsert_parent_profile(
+        db,
+        user_id=parent_verified.id,
+        city_id=mumbai.id,
+        state_id=maharashtra.id,
+        address="Powai, Mumbai",
+        area="Powai",
+        pincode="400076",
+    )
+    upsert_parent_profile(
+        db,
+        user_id=parent_unverified.id,
+        city_id=pune.id,
+        state_id=maharashtra.id,
+        address="Baner, Pune",
+        area="Baner",
+        pincode="411045",
+    )
+
+    upsert_tutor_profile(
+        db,
+        user_id=tutor_verified.id,
+        city_id=bengaluru.id,
+        area="Indiranagar",
+        bio="Experienced CBSE and ICSE tutor for STEM subjects.",
+        experience_years=6,
+        fees=800.0,
+        subjects=["Mathematics", "Science", "Physics"],
+        class_range="6-12",
+        modes=["home", "online"],
+        demo_available=True,
+        approved_status=ApprovalStatus.approved,
+        featured=True,
+    )
+    upsert_tutor_profile(
+        db,
+        user_id=tutor_unverified.id,
+        city_id=delhi.id,
+        area="Rohini",
+        bio="New tutor awaiting verification.",
+        experience_years=2,
+        fees=500.0,
+        subjects=["English", "Biology"],
+        class_range="5-10",
+        modes=["online"],
+        demo_available=False,
+        approved_status=ApprovalStatus.pending,
+        featured=False,
+    )
+
+    ensure_parent_lead(
+        db,
+        parent=parent_verified,
+        parent_name="Priya Parent",
+        mobile="9100000001",
+        email="parent.verified@guruhome.test",
+        child_name="Ishaan",
+        class_name="8",
+        board="CBSE",
+        subjects=["Mathematics", "Science"],
+        mode=ModeType.home,
+        address="Powai, Mumbai",
+        city="Mumbai",
+        area="Powai",
+        pincode="400076",
+        budget=6000.0,
+        preferred_time="Evening 5 PM to 7 PM",
+        notes="Looking for a patient tutor for conceptual clarity.",
+    )
+    ensure_parent_lead(
+        db,
+        parent=parent_unverified,
+        parent_name="Rohit Parent",
+        mobile="9100000002",
+        email="parent.unverified@guruhome.test",
+        child_name="Siya",
+        class_name="10",
+        board="ICSE",
+        subjects=["English", "Biology"],
+        mode=ModeType.online,
+        address="Baner, Pune",
+        city="Pune",
+        area="Baner",
+        pincode="411045",
+        budget=4500.0,
+        preferred_time="Morning 7 AM to 8 AM",
+        notes="Needs structured board exam preparation.",
+    )
+
+    ensure_tutor_lead(
+        db,
+        tutor=tutor_verified,
+        tutor_name="Ananya Tutor",
+        subjects=["Mathematics", "Physics"],
+        class_range="8-12",
+        experience=6,
+        mode=["home", "online"],
+        city="Bengaluru",
+        area="Indiranagar",
+        fees=800.0,
+        available_time="Weekdays after 4 PM",
+        demo_available=True,
+        approved_status=ApprovalStatus.approved,
+    )
+    ensure_tutor_lead(
+        db,
+        tutor=tutor_unverified,
+        tutor_name="Kabir Tutor",
+        subjects=["English", "Biology"],
+        class_range="5-10",
+        experience=2,
+        mode=["online"],
+        city="Delhi",
+        area="Rohini",
+        fees=500.0,
+        available_time="Weekends",
+        demo_available=False,
+        approved_status=ApprovalStatus.pending,
+    )
+
+    ensure_payment(
+        db,
+        user_id=parent_verified.id,
+        amount="299.00",
+        purpose="unlock_tutor_contact",
+        status=PaymentStatus.verified,
+    )
+    ensure_payment(
+        db,
+        user_id=tutor_verified.id,
+        amount="499.00",
+        purpose="unlock_parent_contact",
+        status=PaymentStatus.pending,
+    )
+
+    ensure_subscription(
+        db,
+        tutor_id=tutor_verified.id,
+        plan_name="Growth",
+        lead_credits=25,
+        price=1499.0,
+    )
+
+    ensure_review(
+        db,
+        parent_id=parent_verified.id,
+        tutor_id=tutor_verified.id,
+        rating=5,
+        comment="Very clear explanations and punctual sessions.",
+        approved=True,
+    )
+
+    db.commit()
+
+
+def seed_if_empty() -> bool:
+    db = SessionLocal()
+    try:
+        user_count = db.scalar(select(func.count(User.id))) or 0
+        if user_count > 0:
+            return False
+        seed_session(db)
+        return True
     finally:
         db.close()
 

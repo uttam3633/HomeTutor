@@ -13,11 +13,11 @@ export function ReviewsPage() {
   });
 
   const cards =
-    reviewsQuery.data?.map((review) => ({
+    (reviewsQuery.data ?? []).map((review) => ({
       title: `${"★".repeat(review.rating)} ${review.tutor_name}`,
       subtitle: `Review by ${review.parent_name}`,
       meta: review.comment ?? "Approved platform review.",
-    })) ?? [];
+    }));
 
   return (
     <section className="section-shell page-entrance py-14">

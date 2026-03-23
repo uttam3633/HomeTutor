@@ -10,6 +10,7 @@ from app.api.routes import admin, auth, parent, public, tutor
 from app.core.config import settings
 from app.core.limiter import limiter
 from app.core.security_headers import SecurityHeadersMiddleware
+from app.db.seed import seed_if_empty
 from app.db.session import Base, engine
 from app.models import entities  # noqa: F401
 
@@ -17,6 +18,8 @@ from app.models import entities  # noqa: F401
 @asynccontextmanager
 async def lifespan(_: FastAPI):
     Base.metadata.create_all(bind=engine)
+    if settings.auto_seed_demo_data and settings.environment != "production":
+        seed_if_empty()
     yield
 
 

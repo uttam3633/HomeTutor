@@ -20,18 +20,18 @@ export function HomePage() {
   });
 
   const tutorCards =
-    tutorsQuery.data?.slice(0, 6).map((tutor) => ({
+    (tutorsQuery.data ?? []).slice(0, 6).map((tutor) => ({
       title: tutor.name,
       subtitle: tutor.featured ? "Featured tutor" : "Verified tutor",
       meta: `${tutor.subjects.join(", ")} | ${tutor.class_range ?? "All classes"} | ${tutor.fees ? `₹${tutor.fees}` : "Custom fees"}`,
-    })) ?? [];
+    }));
 
   const reviewCards =
-    reviewsQuery.data?.slice(0, 6).map((review) => ({
+    (reviewsQuery.data ?? []).slice(0, 6).map((review) => ({
       title: `${"★".repeat(review.rating)} ${review.tutor_name}`,
       subtitle: `Review by ${review.parent_name}`,
       meta: review.comment ?? "Verified review submitted through GuruHome.",
-    })) ?? [];
+    }));
 
   return (
     <>
