@@ -16,9 +16,10 @@ GuruHome is a production-oriented two-sided marketplace platform connecting pare
 
 1. Copy `.env.example` to `.env`
 2. Run database migrations: `docker compose run --rm backend alembic upgrade head`
-3. Run `docker compose up --build`
-4. Frontend: `http://localhost`
-5. API docs: `http://localhost/api/docs`
+3. Seed sample users: `docker compose run --rm backend python -m app.db.seed`
+4. Run `docker compose up --build`
+5. Frontend: `http://localhost`
+6. API docs: `http://localhost/api/docs`
 
 ## Structure
 
@@ -32,3 +33,4 @@ GuruHome is a production-oriented two-sided marketplace platform connecting pare
 - Payment verification is designed around manual admin approval of uploaded UPI payment proof.
 - Phone numbers are encrypted before database persistence.
 - The project ships as a secure, modular starter with core marketplace flows.
+- All seeded users use password `Test@12345`.
